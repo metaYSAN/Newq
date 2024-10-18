@@ -1,0 +1,44 @@
+name: CI with MySQL
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:5.7
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ROOT_PASSWORD: Fczutphen2030.
+          MYSQL_DATABASE: joinnort_Northbridge
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install Dependencies
+        run: npm install  # Example for a Node.js project
+
+      - name: Run DB migrations
+        env:
+          DB_HOST: localhost
+          DB_PORT: 3306
+          DB_USER: Northbridge
+          DB_PASSWORD: Fczutphen2030.
+          DB_NAME: joinnort_Northbridge
+        run: |
+          mysql -h ${{ secrets.DB_HOST }} -u ${{ secrets.DB_USER }} -p${{ secrets.DB_PASSWORD }} ${{ secrets.DB_NAME }} < migrations.sql
+
+      - name: Run Tests
+        run: npm test
